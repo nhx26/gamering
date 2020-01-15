@@ -42,6 +42,8 @@ boolean finish = true;
 
 boolean gameover = false;
 
+int enemy;
+
 void setup() {
 
   #if defined(__AVR_ATtiny85__) && (F_CPU == 16000000)
@@ -369,7 +371,7 @@ int random_pixel(int min_, int max_){
 }
 
 void rotation(){
-  int enemy; 
+   
   
   int angle = atan2(mpu6050.getAccY(),mpu6050.getAccX()) * 180 / 3.14f;
   
