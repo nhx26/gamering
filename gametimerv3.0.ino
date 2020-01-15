@@ -26,7 +26,7 @@ int mode = 0;
 
 boolean flip = true; 
 
-int prev_pixel = 0;
+int prev_pixel = 8;
 int current_pixel;
 
 double total_z = 0;
@@ -38,11 +38,11 @@ int target = 10;
 
 int score = 0;
 
-boolean finish = true;
+boolean finish = false;
 
 boolean gameover = false;
 
-int enemy;
+int enemy = 50;
 
 void setup() {
 
@@ -249,7 +249,7 @@ void detect_mode(){
     if(mode > 3){
       mode = 0;
     }
-    Serial.println(mode);
+    //Serial.println(mode);
     all_pixels(10,10,10);
     pause(500);
     all_pixels(0,0,0);
@@ -297,7 +297,7 @@ void detect_tap(){
   unsigned long time_now = millis();
   while(millis() < time_now + 5000){
     total_z += IMU.getAccelZ_mss();
-    Serial.print(count_data);
+    //Serial.print(count_data);
     count_data++;
   }
   avg_z = total_z / count_data;  
@@ -371,22 +371,52 @@ int random_pixel(int min_, int max_){
 }
 
 void rotation(){
-   
+//  int sumx=0;
+//  int sumy=0;
+//
+  float avg_y;
+  float avg_x;
+
+ 
+//  for (int i = 0;i<10;i++){
+//    sumx+=mpu6050.getAccX();
+//    sumy+=mpu6050.getAccY();
+//    
+//  }
+
   
-  int angle = atan2(mpu6050.getAccY(),mpu6050.getAccX()) * 180 / 3.14f;
+  avg_y=mpu6050.getAccY();
+  avg_x=mpu6050.getAccX();
+
+
   
+
+  
+  int angle = atan2(avg_y,avg_x) * 180 / 3.14f;
+  Serial.println(angle);
   int angleDash = (angle + 360) % 360;
 //  Serial.println((int)((angleDash / 360.0f) * 16.0f));
-  int one = (int)(((angleDash / 360.0f) * 16.0f));
-  int player = 15 - one;
-  delay(10);
-
+  int current_pixel = (int)(((angleDash / 360.0f) * 16.0f));
+  int player = 15 - current_pixel;
+  //Serial.println(player);
+  pause(50);
+//Serial.println(enemy);
   if(!gameover){
   for (int i = 0; i < 16; i++){
     pixels.setPixelColor(i, pixels.Color(0, 0, 0));
   }
-  pixels.setPixelColor(player, pixels.Color(10, 10, 10));
 
+  if(prev_pixel == player){
+  pixels.setPixelColor(player, pixels.Color(10, 10, 10));
+  pixels.show();
+  }
+  
+  else{
+  pixels.setPixelColor(prev_pixel, pixels.Color(0, 0, 0));
+  pixels.setPixelColor(player, pixels.Color(10, 10, 10));
+  pixels.show();
+  prev_pixel = player;
+  }
   pixels.setPixelColor(target, pixels.Color(10,10,0));
   pixels.show();
   
@@ -397,38 +427,44 @@ void rotation(){
      pause(1000);
      target = random_pixel(0,16);
      level++;
-     finish = true;
+     if(level > 1){
+     finish = true;}
+           Serial.print("zero");
   }
   
-   if(level > 0 && finish){
+   if(level > 1 && finish){
     enemy = random_pixel(0,16);
     
     while(enemy == target || enemy == player){
       enemy = random_pixel(0,16);
+      Serial.print("one");
     }
-    
+          Serial.print("two");
     pixels.setPixelColor(enemy,pixels.Color(10,0,0));
     pixels.show();
     pause(1000);
     finish = false;
    }
 
-   if(level > 0 && !finish){
+   if(level > 1 && !finish){
     pixels.setPixelColor(enemy,pixels.Color(10,0,0));
     pixels.show();
+          Serial.print("three");
    }
 
    
-   Serial.println(gameover);
+   //Serial.println(gameover);
    if(player == enemy){
    pixels.setPixelColor(enemy,pixels.Color(10,0,10));
    pixels.show();
    gameover = true;
+         Serial.print("four");
   }
   }
 
   if(gameover){
     show_score(score);
+          Serial.print("five");
   }
 
   }
