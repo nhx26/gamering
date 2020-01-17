@@ -44,6 +44,10 @@ boolean gameover = false;
 
 int enemy = 50;
 
+boolean showscore = true;
+
+int timer = 0;
+
 void setup() {
 
   #if defined(__AVR_ATtiny85__) && (F_CPU == 16000000)
@@ -291,13 +295,13 @@ void rotate_light_z(){
   
 }
 
-void detect_tap(){
+boolean detect_tap(){
    double avg_z;
   if(count_data == 0){
   unsigned long time_now = millis();
   while(millis() < time_now + 5000){
     total_z += IMU.getAccelZ_mss();
-    //Serial.print(count_data);
+    Serial.print(count_data);
     count_data++;
   }
   avg_z = total_z / count_data;  
@@ -307,6 +311,7 @@ void detect_tap(){
     pixels.setPixelColor(3, pixels.Color(10,0,0));
     pixels.show();
     Serial.println("tap");
+    return true;
     unsigned long time_now = millis();
     while(millis() < time_now + 500){
    
@@ -388,14 +393,11 @@ void rotation(){
   avg_y=mpu6050.getAccY();
   avg_x=mpu6050.getAccX();
 
-
-  
-
   
   int angle = atan2(avg_y,avg_x) * 180 / 3.14f;
   Serial.println(angle);
   int angleDash = (angle + 360) % 360;
-//  Serial.println((int)((angleDash / 360.0f) * 16.0f));
+
   int current_pixel = (int)(((angleDash / 360.0f) * 16.0f));
   int player = 15 - current_pixel;
   //Serial.println(player);
@@ -432,7 +434,7 @@ void rotation(){
            Serial.print("zero");
   }
   
-   if(level > 1 && finish){
+   if(level > 1 && level < 5 && finish){
     enemy = random_pixel(0,16);
     
     while(enemy == target || enemy == player){
@@ -441,15 +443,24 @@ void rotation(){
     }
           Serial.print("two");
     pixels.setPixelColor(enemy,pixels.Color(10,0,0));
-    pixels.show();
-    pause(1000);
+    pixels.show(); 
+   
     finish = false;
    }
 
-   if(level > 1 && !finish){
+   if(level > 1 && level < 5 && !finish){
     pixels.setPixelColor(enemy,pixels.Color(10,0,0));
     pixels.show();
           Serial.print("three");
+   }
+
+    if(level > 4 && finish){
+      timer++;
+      if(timer % 10 == 0){
+    enemy = random_pixel(0,16);
+      }
+    pixels.setPixelColor(enemy,pixels.Color(10,0,0));
+    pixels.show();
    }
 
    
@@ -464,22 +475,30 @@ void rotation(){
 
   if(gameover){
     show_score(score);
-          Serial.print("five");
+    Serial.print("five");
+    if (IMU.getAccelX_mss() > 15){
+     gameover = false;
+     showscore = true;
+     score = 0;
+     pause(1000);
+   }
   }
 
   }
 
   void show_score(int score){
-
+      if(showscore){
       for (int i = 0; i < 16; i++){
     pixels.setPixelColor(i, pixels.Color(0, 0, 0));
   }
   pixels.show();
-      pause(1000);
+      pause(2000);
+      showscore = false;
+      }
       
    for (int i = 0; i < score; i++){
      pixels.setPixelColor(i, pixels.Color(10, 10, 0));
      pixels.show();
+     pause(500);
    }
   }
- 
