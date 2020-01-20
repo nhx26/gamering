@@ -48,6 +48,8 @@ boolean showscore = true;
 
 int timer = 0;
 
+int brightness = 30;
+
 void setup() {
 
   #if defined(__AVR_ATtiny85__) && (F_CPU == 16000000)
@@ -358,7 +360,7 @@ void rotate_game(){
   }
 
   current_pixel = deg / 22.5;
-
+  
   if(prev_pixel == current_pixel){
   pixels.setPixelColor(15 - prev_pixel, pixels.Color(0,0,20));
   
@@ -427,22 +429,22 @@ void rotation(){
   }
 
   if(prev_pixel == player){
-  pixels.setPixelColor(player, pixels.Color(10, 10, 10));
+  pixels.setPixelColor(player, pixels.Color(brightness, brightness, brightness));
   pixels.show();
   }
   
   else{
   pixels.setPixelColor(prev_pixel, pixels.Color(0, 0, 0));
-  pixels.setPixelColor(player, pixels.Color(10, 10, 10));
+  pixels.setPixelColor(player, pixels.Color(brightness, brightness, brightness));
   pixels.show();
   prev_pixel = player;
   }
-  pixels.setPixelColor(target, pixels.Color(10,10,0));
+  pixels.setPixelColor(target, pixels.Color(brightness,brightness,0));
   pixels.show();
   
   if(target == player){
      score++;
-     pixels.setPixelColor(target, pixels.Color(0,10,0));
+     pixels.setPixelColor(target, pixels.Color(0,brightness,0));
      pixels.show();
      pause(1000);
      target = random_pixel(0,16);
@@ -461,14 +463,14 @@ void rotation(){
       enemy = random_pixel(0,16);
         }
     }
-    pixels.setPixelColor(enemy,pixels.Color(10,0,0));
+    pixels.setPixelColor(enemy,pixels.Color(brightness,0,0));
     pixels.show();
    }
 
    
    //Serial.println(gameover);
    if(player == enemy){
-   pixels.setPixelColor(enemy,pixels.Color(10,0,10));
+   pixels.setPixelColor(enemy,pixels.Color(brightness,0,brightness));
    pixels.show();
    gameover = true;
 
@@ -478,7 +480,7 @@ void rotation(){
   if(gameover){
     show_score(score);
     Serial.println("over");
-    if (abs(mpu6050.getAccX()) > 1){
+    if ((abs(mpu6050.getAccX()) > 1)||(abs(mpu6050.getAccY()) > 1)){
      gameover = false;
      showscore = true;
      score = 0;
@@ -486,7 +488,7 @@ void rotation(){
      level = 0;
 
      //blink
-     all_pixels(10, 10, 10);
+     all_pixels(brightness, brightness, brightness);
      pause(1000);
      all_pixels(0, 0, 0);
      pause(1000);
@@ -507,7 +509,7 @@ void rotation(){
       }
       
    for (int i = 0; i < score; i++){
-     pixels.setPixelColor(i, pixels.Color(10, 10, 0));
+     pixels.setPixelColor(i, pixels.Color(brightness, brightness, 0));
      pixels.show();
      pause(500);
    }
