@@ -3,7 +3,7 @@
  #include <avr/power.h> // Required for 16 MHz Adafruit Trinket
 #endif
 
-#define PIN        9 // On Trinket or Gemma, suggest changing this to 1
+#define PIN        5 // On Trinket or Gemma, suggest changing this to 1
 
 #define NUMPIXELS 16 // Popular NeoPixel ring size
 
@@ -59,14 +59,14 @@ void setup() {
   Serial.begin(115200);
 
 
-  status = IMU.begin();
-  if (status < 0) {
-    Serial.println("IMU initialization unsuccessful");
-    Serial.println("Check IMU wiring or try cycling power");
-    Serial.print("Status: ");
-    Serial.println(status);
-    while(1) {}
-  }
+//  status = IMU.begin();
+//  if (status < 0) {
+//    Serial.println("IMU initialization unsuccessful");
+//    Serial.println("Check IMU wiring or try cycling power");
+//    Serial.print("Status: ");
+//    Serial.println(status);
+//    while(1) {}
+//  }
 
   randomSeed(analogRead(0));
 
@@ -79,15 +79,31 @@ void setup() {
 void loop() {
 
   mpu6050.update();
+
 //  Serial.print("angleX : ");
 //  Serial.print(mpu6050.getAngleX());
 //  Serial.print("\tangleY : ");
 //  Serial.print(mpu6050.getAngleY());
 //  Serial.print("\tangleZ : ");
 //  Serial.println(mpu6050.getAngleZ());
-  
-  IMU.readSensor();
-//  Serial.print(IMU.getAccelX_mss(),6);
+//  
+//  Serial.print("temp : ");Serial.println(mpu6050.getTemp());
+//  Serial.print("accX : ");Serial.print(mpu6050.getAccX());
+//  Serial.print("\taccY : ");Serial.print(mpu6050.getAccY());
+//  Serial.print("\taccZ : ");Serial.println(mpu6050.getAccZ());
+//  
+//  Serial.print("gyroX : ");Serial.print(mpu6050.getGyroX());
+//  Serial.print("\tgyroY : ");Serial.print(mpu6050.getGyroY());
+//  Serial.print("\tgyroZ : ");Serial.println(mpu6050.getGyroZ());
+//  
+//  Serial.print("accAngleX : ");Serial.print(mpu6050.getAccAngleX());
+//  Serial.print("\taccAngleY : ");Serial.println(mpu6050.getAccAngleY());
+//  
+//  Serial.print("gyroAngleX : ");Serial.print(mpu6050.getGyroAngleX());
+//  Serial.print("\tgyroAngleY : ");Serial.print(mpu6050.getGyroAngleY());
+//  Serial.print("\tgyroAngleZ : ");Serial.println(mpu6050.getGyroAngleZ());
+//  IMU.readSensor();
+//  Serial.print(mpu6050.getAccX(),6);
 //  Serial.print("\t");
 //  Serial.print(IMU.getAccelY_mss(),6);
 //  Serial.print("\t");
@@ -108,31 +124,31 @@ void loop() {
 //  Serial.println(IMU.getTemperature_C(),6);
 //  pause(500);
 
-
 //
-//  detect_mode();
-//detect_tap();
+//if(detect_flip() == true){
+//  mode++;
+//  Serial.print("mode: ");
+//  Serial.print(mode);
+//  Serial.println();
+//  pause(2000);
+//}
 //
-//rotate_light();
-
-//rotate_game();
-
+//if (mode % 4 == 1){
+//  spinner();
+//}
+//
+//if (mode % 4 == 2){
+//  dice_roll();
+//}
+//
+//if (mode % 4 == 3){
+//  hourglass();
+//}
+//
+//if(mode % 4 == 0){
+//  rotation();
+//}
 rotation();
-//Serial.println(gameover);
-
-if (mode == 1){
-  //spinner();
-
-}
-
-if (mode == 2){
-  dice_roll();
-}
-
-if (mode == 3){
-  hourglass();
-}
-
 
 }
 
@@ -146,7 +162,7 @@ void all_pixels(int r, int g, int b){
 
 void dice_roll(){
   
-  if(IMU.getAccelX_mss()> 5){
+  if(mpu6050.getAccX()> 5){
 
   for (int i = 0; i < rand; i++){
   pixels.setPixelColor(i, pixels.Color(0, 0,0));
@@ -177,7 +193,7 @@ void dice_roll(){
 
 void spinner(){
 
-  if(IMU.getAccelX_mss()> 5) {
+  if(mpu6050.getAccX()> 5) {
     
   for (int i = 0; i < rand; i++){
   pixels.setPixelColor(i, pixels.Color(0, 0,0));
@@ -232,7 +248,7 @@ if (mpu6050.getAngleY() < 0 and !flip){
 } 
 
 if(!flip){
-  detect_mode();
+//  detect_mode();
 }
 
 
@@ -243,26 +259,6 @@ void pause(int period){
   unsigned long time_now = millis();
   while(millis() < time_now + period){
     
-  }
-}
-
-void detect_mode(){
-
-  if(IMU.getAccelY_mss() > 20){
-    mode++;
-    if(mode > 3){
-      mode = 0;
-    }
-    //Serial.println(mode);
-    all_pixels(10,10,10);
-    pause(500);
-    all_pixels(0,0,0);
-    pause(500);
-    for (int i = 0; i < mode ; i++){
-    pixels.setPixelColor(i, pixels.Color(0,10,0));
-    }
-    pixels.show();
-    pause(500);
   }
 }
 
@@ -327,6 +323,28 @@ boolean detect_tap(){
       
     }
   }
+
+ boolean detect_flip(){
+   double avg_z;
+  if(count_data == 0){
+  unsigned long time_now = millis();
+  while(millis() < time_now + 5000){
+    total_z += IMU.getAccelZ_mss();
+    Serial.print(count_data);
+    count_data++;
+  }
+  avg_z = total_z / count_data;  
+  }
+
+if(IMU.getAccelZ_mss() < -avg_z){
+  Serial.println("flip");
+  return true;
+}
+else{
+  return false;
+}
+  
+ }
 
 void rotate_game(){
   
@@ -395,7 +413,7 @@ void rotation(){
 
   
   int angle = atan2(avg_y,avg_x) * 180 / 3.14f;
-  Serial.println(angle);
+//  Serial.println(angle);
   int angleDash = (angle + 360) % 360;
 
   int current_pixel = (int)(((angleDash / 360.0f) * 16.0f));
@@ -429,36 +447,20 @@ void rotation(){
      pause(1000);
      target = random_pixel(0,16);
      level++;
-     if(level > 1){
+     if(level > 0){
      finish = true;}
-           Serial.print("zero");
   }
   
-   if(level > 1 && level < 5 && finish){
-    enemy = random_pixel(0,16);
-    
-    while(enemy == target || enemy == player){
-      enemy = random_pixel(0,16);
-      Serial.print("one");
-    }
-          Serial.print("two");
-    pixels.setPixelColor(enemy,pixels.Color(10,0,0));
-    pixels.show(); 
-   
-    finish = false;
-   }
 
-   if(level > 1 && level < 5 && !finish){
-    pixels.setPixelColor(enemy,pixels.Color(10,0,0));
-    pixels.show();
-          Serial.print("three");
-   }
-
-    if(level > 4 && finish){
+    if(level > 0 && finish and !gameover){
+      
       timer++;
       if(timer % 10 == 0){
     enemy = random_pixel(0,16);
-      }
+        while(enemy == target || enemy == player){
+      enemy = random_pixel(0,16);
+        }
+    }
     pixels.setPixelColor(enemy,pixels.Color(10,0,0));
     pixels.show();
    }
@@ -469,18 +471,26 @@ void rotation(){
    pixels.setPixelColor(enemy,pixels.Color(10,0,10));
    pixels.show();
    gameover = true;
-         Serial.print("four");
+
   }
   }
 
   if(gameover){
     show_score(score);
-    Serial.print("five");
-    if (IMU.getAccelX_mss() > 15){
+    Serial.println("over");
+    if (abs(mpu6050.getAccX()) > 1){
      gameover = false;
      showscore = true;
      score = 0;
      pause(1000);
+     level = 0;
+
+     //blink
+     all_pixels(10, 10, 10);
+     pause(1000);
+     all_pixels(0, 0, 0);
+     pause(1000);
+     
    }
   }
 
