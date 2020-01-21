@@ -112,7 +112,7 @@ if(detect_flip()){
 }
 
 if (mode % 4 == 1){
-  tap_game;
+  tap_game();
 }
 
 if (mode % 4 == 2){
@@ -248,9 +248,14 @@ boolean detect_tap(){
     count_data++;
   }
   avg_z = total_z / count_data;  
+  Serial.print("z: ");
+  Serial.print(avg_z);
+  Serial.println(" ");
   }
-
-  if( abs(avg_z - mpu6050.getAccZ()) > 0.1){
+  Serial.print("diff: ");
+  Serial.print(abs(avg_z - mpu6050.getAccZ()));
+  Serial.println(" ");
+  if( abs(avg_z - mpu6050.getAccZ()) > 1){
     Serial.println("tap");
     return true;
     
@@ -404,10 +409,6 @@ void catch_the_coin(){
 void tap_game(){
 
   if(!gameover_tap){
-
-  for (int i = 0; i < 16; i++){
-    pixels.setPixelColor(i, pixels.Color(0, 0, 0));
-  }
     
     pixels.setPixelColor(current_pos, pixels.Color(0, 0, brightness));
     pixels.show();
