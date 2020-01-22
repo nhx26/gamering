@@ -63,6 +63,19 @@ float avg_z;
 
 int passby = 0;
 
+bool reaction_start = true;
+bool first = true; 
+bool second = true; 
+
+float p1s = 0;
+float p2s = 0;
+
+float p1e = 0;
+float p2e = 0;
+
+bool p1 = true; 
+bool p2 = true;
+
 void setup() {
 
 #if defined(__AVR_ATtiny85__) && (F_CPU == 16000000)
@@ -136,37 +149,45 @@ void loop() {
   //
   //
 
-  if (detect_flip()) {
-    unsigned long time_now = millis();
-    while (millis() < time_now + 2000) {
-      all_pixels(0, 0, brightness);
-    }
-    mode++;
-    Serial.print("mode: ");
-    Serial.print(mode);
-    Serial.println();
-    time_now = millis();
-    while (millis() < time_now + 3000) {
-      all_pixels(0, 0, 0);
-    }
-  }
+//    if (detect_flip()) {
+//      unsigned long time_now = millis();
+//      while (millis() < time_now + 2000) {
+//        all_pixels(0, 0, brightness);
+//      }
+//      mode++;
+//      Serial.print("mode: ");
+//      Serial.print(mode);
+//      Serial.println();
+//      time_now = millis();
+//      while (millis() < time_now + 3000) {
+//        all_pixels(0, 0, 0);
+//      }
+//    }
+//  
+//    if (mode % 4 == 0) {
+//      catch_the_coin();
+//    }
+//  
+//    if (mode % 4 == 1) {
+//      tap_game();
+//    }
+//  
+//    if (mode % 4 == 2) {
+//      dice_roll();
+//    }
+//  
+//    if (mode % 4 == 3) {
+//      spinner();
+//    }
+  reaction_game();
+}
 
-  if (mode % 4 == 0) {
-    catch_the_coin();
-  }
 
-  if (mode % 4 == 1) {
-    tap_game();
-  }
-
-  if (mode % 4 == 2) {
-    dice_roll();
-  }
-
-  if (mode % 4 == 3) {
-    spinner();
-  }
-
+int random_pixel(int min_, int max_) {
+  int target = random(min_ , max_);
+  pixels.setPixelColor(target, pixels.Color(brightness, 0, 0));
+  pixels.show();
+  return target;
 }
 
 void all_pixels(int r, int g, int b) {
@@ -460,15 +481,15 @@ void show_coin_score(int score_made) {
           level = 0;
           enemy = 50;
 
-        //      //blink
-              unsigned long time_now = millis();
-      while (millis() < time_now + 1000) {
-          all_pixels(brightness, brightness, brightness);
-}
-   
+          //      //blink
+          unsigned long time_now = millis();
           while (millis() < time_now + 1000) {
-          all_pixels(0, 0,0);
-}
+            all_pixels(brightness, brightness, brightness);
+          }
+
+          while (millis() < time_now + 1000) {
+            all_pixels(0, 0, 0);
+          }
         }
 
       }
@@ -480,7 +501,7 @@ void show_coin_score(int score_made) {
     }
     unsigned long time_now = millis();
     while (millis() < time_now + 1000) {
-          pixels.show();
+      pixels.show();
     }
 
   }
@@ -490,7 +511,7 @@ void show_coin_score(int score_made) {
 
 void tap_game() {
 
-if (!gameover_tap) {
+  if (!gameover_tap) {
 
     pixels.setPixelColor(current_pos, pixels.Color(0, 0, brightness));
     pixels.show();
@@ -553,7 +574,7 @@ if (!gameover_tap) {
   }
 
   if (gameover_tap) {
-      show_tap_score(score_tap);
+    show_tap_score(score_tap);
   }
 }
 
@@ -568,23 +589,23 @@ void show_tap_score(int score_made) {
     showscore = false;
   }
 
- mpu6050.update();
-        if ((abs(mpu6050.getAccX()) > 1) || (abs(mpu6050.getAccY()) > 1)) {
-          gameover_tap = false;
-          showscore = true;
-          score_tap = 0;
-          level = 0;
-          passby = 0;
+  mpu6050.update();
+  if ((abs(mpu6050.getAccX()) > 1) || (abs(mpu6050.getAccY()) > 1)) {
+    gameover_tap = false;
+    showscore = true;
+    score_tap = 0;
+    level = 0;
+    passby = 0;
 
-        //      blink
-       unsigned long time_now = millis();
-      while (millis() < time_now + 1000) {
-          all_pixels(brightness, brightness, brightness);
-}
-   
-          all_pixels(0, 0,0);
-        }
-  
+    //      blink
+    unsigned long time_now = millis();
+    while (millis() < time_now + 1000) {
+      all_pixels(brightness, brightness, brightness);
+    }
+
+    all_pixels(0, 0, 0);
+  }
+
 
   while (score_made > 0) {
     for (int i = 0; i < score_made; i++) {
@@ -600,15 +621,15 @@ void show_tap_score(int score_made) {
           level = 0;
           passby = 0;
 
-        //      //blink
-              unsigned long time_now = millis();
-      while (millis() < time_now + 1000) {
-          all_pixels(brightness, brightness, brightness);
-}
-   
+          //      //blink
+          unsigned long time_now = millis();
           while (millis() < time_now + 1000) {
-          all_pixels(0, 0,0);
-}
+            all_pixels(brightness, brightness, brightness);
+          }
+
+          while (millis() < time_now + 1000) {
+            all_pixels(0, 0, 0);
+          }
         }
 
       }
@@ -620,13 +641,95 @@ void show_tap_score(int score_made) {
     }
     unsigned long time_now = millis();
     while (millis() < time_now + 1000) {
-          pixels.show();
+      pixels.show();
     }
 
   }
 
 }
 
+void reaction_game() {
+  //Start indicator
+
+  if(reaction_start){
+  unsigned long time_now = millis();
+  while (millis() < time_now + 500) {
+    all_pixels(brightness, brightness, brightness);
+  }
+  time_now = millis();
+  while (millis() < time_now + 500) {
+    all_pixels(0, 0, 0);
+  }
+
+
+  time_now = millis();
+  while (millis() < time_now + 500) {
+    all_pixels(brightness, brightness, brightness);
+  }
+  time_now = millis();
+  while (millis() < time_now + 500) {
+    all_pixels(0, 0, 0);
+  }
+
+  time_now = millis();
+  while (millis() < time_now + 500) {
+    all_pixels(brightness, brightness, brightness);
+  }
+  time_now = millis();
+  while (millis() < time_now + 500) {
+    all_pixels(0, 0, 0);
+  }
+  reaction_start = false;
+  }
+
+int random_time = random(3000, 10000);
+
+  unsigned long time_now = millis();
+  while (millis() < time_now + random_time) {
+    
+  }
+
+  //player 1 - blue
+  if(p1){
+  while (!detect_tap()) {
+    if(first){
+    p1s = millis();
+    first = false;
+    }
+    all_pixels(0, 0, brightness);
+     }
+     
+  all_pixels(0, 0, 0);
+  p1e = millis();
+  p1 = false;
+  }
+
+random_time = random(3000, 10000);
+
+  unsigned long time_now = millis();
+  while (millis() < time_now + random_time) {
+    
+  }
+  
+  //player 2 - red
+    if(p2){
+  while (!detect_tap()) {
+    if(second){
+    p2s = millis();
+    second = false;
+    }
+    all_pixels(0, 0, brightness);
+     }
+     
+  all_pixels(0, 0, 0);
+  p2e = millis();
+  p2 = false;
+  }
+  
+  
+
+     
+  }
 
 
 
@@ -666,11 +769,4 @@ void check_tap() {
       Serial.println(tapCnt);
     }
   }
-}
-
-int random_pixel(int min_, int max_) {
-  int target = random(min_ , max_);
-  pixels.setPixelColor(target, pixels.Color(brightness, 0, 0));
-  pixels.show();
-  return target;
 }
