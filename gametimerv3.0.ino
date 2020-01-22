@@ -1,7 +1,18 @@
 #include <Adafruit_NeoPixel.h>
+
 #ifdef __AVR__
 #include <avr/power.h> 
 #endif
+
+#define DELAYVAL 500
+
+#include "MPU9250.h"
+
+#include <MPU6050_tockn.h>
+
+#include <Wire.h>
+
+#include <SparkFunMPU9250-DMP.h>
 
 #define PIN 5 // WS2812 leds are connected to this pin 
 
@@ -9,30 +20,18 @@
 
 Adafruit_NeoPixel pixels(NUMPIXELS, PIN, NEO_GRB + NEO_KHZ800);
 
-#define DELAYVAL 500
-
-#include "MPU9250.h"
-
-#include <MPU6050_tockn.h>
-#include <Wire.h>
-
 MPU6050 mpu6050(Wire);
-
-#include <SparkFunMPU9250-DMP.h>
 
 MPU9250_DMP imu;
 
 int status;
 
-int mode = 0;
+int mode = 0; // Game ring mode
 
-boolean flip = true;
+boolean flip = true; // Flip state to change mode
 
 int prev_pixel = 8;
 int current_pixel;
-
-double total_z = 0;
-int count_data = 0;
 
 int level = 0;
 int level_tap = 0;
