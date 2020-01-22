@@ -152,7 +152,7 @@ void loop() {
 
 }
 
-
+// Function to show mode change
 void show_flip() {
   if (detect_flip()) {
     unsigned long time_now = millis();
@@ -266,7 +266,7 @@ void pause_player(int period) {
 
   unsigned long time_now = millis();
   while (millis() < time_now + period) {
-    if ((current_pos == target) && (detect_tap() == true)) {
+    if ((current_pos == target) && detect_tap()){
       pixels.setPixelColor(target, pixels.Color(brightness, 0, 0));
       unsigned long time_now = millis();
       while (millis() < time_now + 500) {
@@ -276,6 +276,10 @@ void pause_player(int period) {
       score_tap++;
       target = random_pixel(0, 16);
       passby = 0;
+    }
+
+    if ((current_pos != target)  && (detect_tap())){
+      
     }
   }
 }
@@ -492,18 +496,6 @@ void tap_game() {
       pause_player(50);
     }
 
-    if ((current_pos == target) && (detect_tap() == true)) {
-      pixels.setPixelColor(target, pixels.Color(brightness, 0, 0));
-      unsigned long time_start = millis();
-      while (millis() < time_start + 500) {
-        pixels.show();
-      }
-      level++;
-      score_tap++;
-      target = random_pixel(0, 16);
-      passby = 0;
-    }
-
     if ((current_pos == target) && (detect_tap() == false)) {
       passby++;
     }
@@ -606,29 +598,41 @@ void reaction_game() {
     unsigned long time_now = millis();
     while (millis() < time_now + 500) {
       all_pixels(brightness, brightness, brightness);
+      if (detect_tap()) {
+      }
     }
     time_now = millis();
     while (millis() < time_now + 500) {
       all_pixels(0, 0, 0);
+      if (detect_tap()) {
+      }
     }
 
 
     time_now = millis();
     while (millis() < time_now + 500) {
       all_pixels(brightness, brightness, brightness);
+      if (detect_tap()) {
+      }
     }
     time_now = millis();
     while (millis() < time_now + 500) {
+      if (detect_tap()) {
+      }
       all_pixels(0, 0, 0);
     }
 
     time_now = millis();
     while (millis() < time_now + 500) {
       all_pixels(brightness, brightness, brightness);
+      if (detect_tap()) {
+      }
     }
 
     time_now = millis();
     while (millis() < time_now + 500) {
+      if (detect_tap()) {
+      }
       all_pixels(0, 0, 0);
     }
     reaction_start = false;
@@ -638,7 +642,8 @@ void reaction_game() {
 
   unsigned long time_now = millis();
   while (millis() < time_now + random_time) {
-
+    if (detect_tap()) {
+    }
   }
 
   //player 1 - blue
@@ -662,7 +667,8 @@ void reaction_game() {
 
   time_now = millis();
   while (millis() < time_now + 1000) {
-
+    if (detect_tap()) {
+    }
   }
 
   all_pixels(0, 0, 0);
@@ -671,7 +677,8 @@ void reaction_game() {
 
   time_now = millis();
   while (millis() < time_now + random_time) {
-
+    if (detect_tap()) {
+    }
   }
 
   //player 2 - red
@@ -693,42 +700,48 @@ void reaction_game() {
   time_now = millis();
   while (millis() < time_now + 500) {
     all_pixels(brightness, 0, brightness);
-
+    if (detect_tap()) {
+    }
   }
   time_now = millis();
   while (millis() < time_now + 500) {
     all_pixels(0, 0, 0);
-
+    if (detect_tap()) {
+    }
   }
 
   time_now = millis();
   while (millis() < time_now + 500) {
     all_pixels(brightness, 0, brightness);
+    if (detect_tap()) {
+    }
   }
   time_now = millis();
   while (millis() < time_now + 500) {
     all_pixels(0, 0, 0);
-
+    if (detect_tap()) {
+    }
   }
 
   time_now = millis();
   while (millis() < time_now + 500) {
     all_pixels(brightness, 0, brightness);
-
+    if (detect_tap()) {
+    }
   }
   time_now = millis();
   while (millis() < time_now + 500) {
     all_pixels(0, 0, 0);
-
+    if (detect_tap()) {
+    }
   }
-
-
 
   if ( (p1e-p1s) < (p2e-p2s)) {
     time_now = millis();
     while (millis() < time_now + 2000) {
       all_pixels(0, 0, brightness);
-
+      if (detect_tap()) {
+      }
     }
   }
 
@@ -736,7 +749,8 @@ void reaction_game() {
     time_now = millis();
     while (millis() < time_now + 2000) {
       all_pixels(brightness, 0, 0);
-
+      if (detect_tap()) {
+      }
     }
     all_pixels(0, 0, 0);
   }
@@ -749,6 +763,8 @@ void reaction_game() {
   time_now = millis();
   while (millis() < time_now + 5000) {
     all_pixels(0, 0, 0);
+    if (detect_tap()) {
+    }
   }
 }
 
