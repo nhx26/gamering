@@ -266,7 +266,7 @@ void pause_player(int period) {
 
   unsigned long time_now = millis();
   while (millis() < time_now + period) {
-    if ((current_pos == target) && detect_tap()){
+    if ((current_pos == target) && detect_tap()) {
       pixels.setPixelColor(target, pixels.Color(brightness, 0, 0));
       unsigned long time_now = millis();
       while (millis() < time_now + 500) {
@@ -278,8 +278,8 @@ void pause_player(int period) {
       passby = 0;
     }
 
-    if ((current_pos != target)  && (detect_tap())){
-      
+    if ((current_pos != target)  && (detect_tap())) {
+
     }
   }
 }
@@ -316,8 +316,8 @@ boolean detect_tap() {
 
 
 boolean detect_flip() {
-
-  if (mpu6050.getAccZ() < -1) {
+  
+if (mpu6050.getAccZ() < -1) {
     Serial.println("flip");
     return true;
   }
@@ -353,7 +353,7 @@ void catch_the_coin() {
         pixels.setPixelColor(i, pixels.Color(0, 0, 0));
       }
     }
-
+    // Setting level
     if (prev_pixel == player) {
       pixels.setPixelColor(player, pixels.Color(brightness, brightness, brightness));
       pixels.show();
@@ -384,7 +384,7 @@ void catch_the_coin() {
       }
     }
 
-
+    // Generating new enemy
     if (level > 0 && finish and !gameover) {
 
       timer++;
@@ -450,7 +450,7 @@ void show_coin_score(int score_made) {
 
       }
     }
-
+    // For scores greater than 15
     score_made -= 15;
     for (int i = 0; i < 16; i++) {
       pixels.setPixelColor(i, pixels.Color(0, 0, 0));
@@ -476,6 +476,7 @@ void tap_game() {
       pixels.show();
     }
 
+    //Speed of player
     if (level == 0) {
       pause_player(1000);
     }
@@ -652,18 +653,18 @@ void reaction_game() {
       p1s = millis();
       first = false;
     }
-    all_pixels(0, 0, brightness);
     while (!detect_tap()) {
+      all_pixels(0, 0, brightness);
     }
-    all_pixels(0, 0, 0);
     p1e = millis();
+    all_pixels(0, 0, 0);
     p1 = false;
   }
 
 
   //change mode
 
-  all_pixels(0, 0, 0);
+  all_pixels(brightness, brightness, brightness);
 
   time_now = millis();
   while (millis() < time_now + 1000) {
@@ -683,15 +684,15 @@ void reaction_game() {
 
   //player 2 - red
   if (p2) {
-    if (first) {
+    if (second) {
       p2s = millis();
       first = false;
     }
-    all_pixels( brightness, 0, 0);
     while (!detect_tap()) {
+      all_pixels(brightness, 0, 0);
     }
-    all_pixels(0, 0, 0);
     p2e = millis();
+    all_pixels(0, 0, 0);
     p2 = false;
   }
 
@@ -740,8 +741,6 @@ void reaction_game() {
     time_now = millis();
     while (millis() < time_now + 2000) {
       all_pixels(0, 0, brightness);
-      if (detect_tap()) {
-      }
     }
   }
 
@@ -749,11 +748,9 @@ void reaction_game() {
     time_now = millis();
     while (millis() < time_now + 2000) {
       all_pixels(brightness, 0, 0);
-      if (detect_tap()) {
-      }
     }
-    all_pixels(0, 0, 0);
   }
+
   reaction_start = true;
   p1 = true;
   p2 = true;
