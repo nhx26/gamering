@@ -652,86 +652,142 @@ void show_tap_score(int score_made) {
 
 void reaction_game() {
   //Start indicator
+  if (reaction_start) {
+    unsigned long time_now = millis();
+    while (millis() < time_now + 500) {
+      all_pixels(brightness, brightness, brightness);
+    }
+    time_now = millis();
+    while (millis() < time_now + 500) {
+      all_pixels(0, 0, 0);
+    }
 
-  if(reaction_start){
-  unsigned long time_now = millis();
-  while (millis() < time_now + 500) {
-    all_pixels(brightness, brightness, brightness);
-  }
-  time_now = millis();
-  while (millis() < time_now + 500) {
-    all_pixels(0, 0, 0);
+
+    time_now = millis();
+    while (millis() < time_now + 500) {
+      all_pixels(brightness, brightness, brightness);
+    }
+    time_now = millis();
+    while (millis() < time_now + 500) {
+      all_pixels(0, 0, 0);
+    }
+
+    time_now = millis();
+    while (millis() < time_now + 500) {
+      all_pixels(brightness, brightness, brightness);
+    }
+    time_now = millis();
+    while (millis() < time_now + 500) {
+      all_pixels(0, 0, 0);
+    }
+    reaction_start = false;
   }
 
-
-  time_now = millis();
-  while (millis() < time_now + 500) {
-    all_pixels(brightness, brightness, brightness);
-  }
-  time_now = millis();
-  while (millis() < time_now + 500) {
-    all_pixels(0, 0, 0);
-  }
-
-  time_now = millis();
-  while (millis() < time_now + 500) {
-    all_pixels(brightness, brightness, brightness);
-  }
-  time_now = millis();
-  while (millis() < time_now + 500) {
-    all_pixels(0, 0, 0);
-  }
-  reaction_start = false;
-  }
-
-int random_time = random(3000, 10000);
+  int random_time = random(3000, 10000);
 
   unsigned long time_now = millis();
   while (millis() < time_now + random_time) {
-    
+
   }
 
   //player 1 - blue
-  if(p1){
-  while (!detect_tap()) {
-    if(first){
-    p1s = millis();
-    first = false;
+  if (p1) {
+    if (first) {
+      p1s = millis();
+      first = false;
     }
     all_pixels(0, 0, brightness);
-     }
-     
-  all_pixels(0, 0, 0);
-  p1e = millis();
-  p1 = false;
+    while (!detect_tap()) {
+    }
+    all_pixels(0, 0, 0);
+    p1e = millis();
+    p1 = false;
   }
 
-random_time = random(3000, 10000);
 
-  unsigned long time_now = millis();
+  //change mode
+  time_now = millis();
+  while (millis() < time_now + 1000) {
+    all_pixels(brightness, brightness, brightness);
+  }
+
+
+
+  random_time = random(3000, 10000);
+
+  time_now = millis();
   while (millis() < time_now + random_time) {
-    
+
   }
-  
+
   //player 2 - red
-    if(p2){
-  while (!detect_tap()) {
-    if(second){
-    p2s = millis();
-    second = false;
+  if (p2) {
+    if (first) {
+      p2s = millis();
+      first = false;
     }
     all_pixels(0, 0, brightness);
-     }
-     
-  all_pixels(0, 0, 0);
-  p2e = millis();
-  p2 = false;
+    while (!detect_tap()) {
+    }
+    all_pixels(0, 0, 0);
+    p2e = millis();
+    p2 = false;
   }
-  
-  
 
-     
+
+  //Winner
+  time_now = millis();
+  while (millis() < time_now + 500) {
+    all_pixels(brightness, 0, brightness);
   }
+  time_now = millis();
+  while (millis() < time_now + 500) {
+    all_pixels(0, 0, 0);
+  }
+
+  time_now = millis();
+  while (millis() < time_now + 500) {
+    all_pixels(brightness, 0, brightness);
+  }
+  time_now = millis();
+  while (millis() < time_now + 500) {
+    all_pixels(0, 0, 0);
+  }
+
+  time_now = millis();
+  while (millis() < time_now + 500) {
+    all_pixels(brightness, 0, brightness);
+  }
+  time_now = millis();
+  while (millis() < time_now + 500) {
+    all_pixels(0, 0, 0);
+  }
+
+
+
+  if ( (p1e-p1s) < (p2e-p2s)) {
+    time_now = millis();
+    while (millis() < time_now + 2000) {
+      all_pixels(0, 0, brightness);
+    }
+  }
+
+  else {
+    time_now = millis();
+    while (millis() < time_now + 2000) {
+      all_pixels(brightness, 0, 0);
+    }
+    all_pixels(0, 0, 0);
+  }
+  reaction_start = true;
+  p1 = true;
+  p2 = true;
+  first = true;
+  second = true;
+
+}
+
+
 
 
 
