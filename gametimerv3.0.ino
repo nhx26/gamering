@@ -4,8 +4,6 @@
 #include <avr/power.h>
 #endif
 
-#include "MPU9250.h"
-
 #include <MPU6050_tockn.h>
 
 #include <Wire.h>
