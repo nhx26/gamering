@@ -1,7 +1,7 @@
 #include <Adafruit_NeoPixel.h>
 
 #ifdef __AVR__
-#include <avr/power.h> 
+#include <avr/power.h>
 #endif
 
 #define DELAYVAL 500
@@ -30,49 +30,49 @@ int mode = 0; // Game ring mode
 
 boolean flip = true; // Flip state to change mode
 
-int prev_pixel = 8;
+int prev_pixel = 8; // LED to start pixel
 int current_pixel;
 
-int level = 0;
-int level_tap = 0;
+int level = 0; // Level for coin game
+int level_tap = 0; // Level for tap game
 
-int target = 10;
+int target = 10; // Target LED for coin game
 
-int score = 0;
-int score_tap = 0;
+int score = 0; // Score for coin game
+int score_tap = 0; // Score for tap game
 
 boolean finish = false;
 
-boolean gameover = false;
+boolean gameover = false; // Gameover for coin game
 
-boolean gameover_tap = false;
+boolean gameover_tap = false; // Gameover for tap game
 
-int enemy = 50;
+int enemy = 50; // Placeholder value
 
 boolean showscore = true;
 
 int timer = 0;
 
-int brightness = 30;
+int brightness = 30; // Brightness for all LEDs
 
 int current_pos = 0;
 int prev_pos;
 
-float avg_z;
+int passby = 0; // Counter for tap game
 
-int passby = 0;
+bool reaction_start = true; // Starting reaction game
+bool first = true;
+bool second = true;
 
-bool reaction_start = true;
-bool first = true; 
-bool second = true; 
-
+//Start times for reaction game
 float p1s = 0;
 float p2s = 0;
 
+//End times for reaction game
 float p1e = 0;
 float p2e = 0;
 
-bool p1 = true; 
+bool p1 = true;
 bool p2 = true;
 
 void setup() {
@@ -90,7 +90,6 @@ void setup() {
   Wire.begin();
   mpu6050.begin();
   mpu6050.calcGyroOffsets(true);
-
 
   //tap detection
   if (imu.begin() != INV_SUCCESS)
@@ -125,70 +124,55 @@ void setup() {
 
 void loop() {
 
-  mpu6050.update();
+  mpu6050.update(); // Update values for sensor
 
-  //    Serial.print("angleX : ");
-  //    Serial.print(mpu6050.getAngleX());
-  //    Serial.print("\tangleY : ");
-  //    Serial.print(mpu6050.getAngleY());
-  //    Serial.print("\tangleZ : ");
-  //    Serial.println(mpu6050.getAngleZ());
-  //
-  //  Serial.print("temp : ");Serial.println(mpu6050.getTemp());
-  //  Serial.print("accX : ");Serial.print(mpu6050.getAccX());
-  //  Serial.print("\taccY : ");Serial.print(mpu6050.getAccY());
-  //  Serial.print("\taccZ : ");Serial.println(mpu6050.getAccZ());
-  //
-  //  Serial.print("gyroX : ");Serial.print(mpu6050.getGyroX());
-  //  Serial.print("\tgyroY : ");Serial.print(mpu6050.getGyroY());
-  //  Serial.print("\tgyroZ : ");Serial.println(mpu6050.getGyroZ());
-  //
-  //  Serial.print("accAngleX : ");Serial.print(mpu6050.getAccAngleX());
-  //  Serial.print("\taccAngleY : ");Serial.println(mpu6050.getAccAngleY());
-  //
-  //
+  //  Mode flipping indicator (blue)
+  show_flip();
 
-//    if (detect_flip()) {
-//      unsigned long time_now = millis();
-//      while (millis() < time_now + 2000) {
-//        all_pixels(0, 0, brightness);
-//      }
-//      mode++;
-//      Serial.print("mode: ");
-//      Serial.print(mode);
-//      Serial.println();
-//      time_now = millis();
-//      while (millis() < time_now + 3000) {
-//        all_pixels(0, 0, 0);
-//      }
-//    }
-//  
-//    if (mode % 4 == 0) {
-//      catch_the_coin();
-//    }
-//  
-//    if (mode % 4 == 1) {
-//      tap_game();
-//    }
-//  
-//    if (mode % 4 == 2) {
-//      dice_roll();
-//    }
-//  
-//    if (mode % 4 == 3) {
-//      spinner();
-//    }
-  reaction_game();
+  if (mode % 5 == 0) {
+    catch_the_coin();
+  }
+
+  if (mode % 5 == 1) {
+    tap_game();
+  }
+
+  if (mode % 5 == 2) {
+    reaction_game();
+  }
+
+  if (mode % 5 == 3) {
+    dice_roll();
+  }
+
+  if (mode % 5 == 4) {
+    spinner();
+  }
+
+
 }
 
-//This function lights up a random pixel on the board within a given range
+
+void show_flip() {
+  if (detect_flip()) {
+    unsigned long time_now = millis();
+    while (millis() < time_now + 2000) {
+      all_pixels(0, 0, brightness);
+    }
+    mode++;
+    time_now = millis();
+    while (millis() < time_now + 3000) {
+      all_pixels(0, 0, 0);
+    }
+  }
+}
+
+// Random number generator
 int random_pixel(int min_, int max_) {
-  int target = random(min_ , max_);
-  pixels.setPixelColor(target, pixels.Color(brightness, 0, 0));
-  pixels.show();
-  return target;
+  return random(min_ , max_);
 }
-//This function lights up all the pixels on the board to the given RGB values
+
+// All LEDs control
 void all_pixels(int r, int g, int b) {
 
   for (int i = 0; i <= 15 ; i++) {
@@ -197,16 +181,15 @@ void all_pixels(int r, int g, int b) {
   pixels.show();
 }
 
-//Dice roll game mode
 void dice_roll() {
-  //detecting shake along both X and Y axes
+
   if ((abs(mpu6050.getAccX()) > 1) || abs(mpu6050.getAccY()) > 1) {
 
     for (int i = 0; i < rand; i++) {
       pixels.setPixelColor(i, pixels.Color(0, 0, 0));
     }
     pixels.show();
-    int rand = random(1, 12); 
+    int rand = random(1, 12);
 
 
     for (int i = 0; i < rand ; i += 2) {
@@ -234,7 +217,6 @@ void dice_roll() {
 
 }
 
-//Spinner game mode
 void spinner() {
 
   if ((abs(mpu6050.getAccX()) > 1) || abs(mpu6050.getAccY()) > 1) {
@@ -279,38 +261,7 @@ void spinner() {
 
 }
 
-void hourglass() {
-
-  if (mpu6050.getAngleY() > 0 and flip) {
-    for (int i = 0; i < 16 ; i++) {
-      pixels.setPixelColor(i, pixels.Color(brightness, brightness, brightness));
-      unsigned long time_now = millis();
-      while (millis() < time_now + 200) {
-        pixels.show();
-      }
-      flip = false;
-    }
-  }
-
-  if (mpu6050.getAngleY() < 0 and !flip) {
-    for (int i = 0; i < 16 ; i++) {
-      pixels.setPixelColor(i, pixels.Color(0, 0, 0));
-      pixels.show();
-      unsigned long time_now = millis();
-      while (millis() < time_now + 200) {
-        pixels.show();
-      }
-      flip = true;
-    }
-  }
-
-  if (!flip) {
-    //  detect_mode();
-  }
-
-
-}
-
+//Checking tap on target for tap game
 void pause_player(int period) {
 
   unsigned long time_now = millis();
@@ -675,6 +626,7 @@ void reaction_game() {
     while (millis() < time_now + 500) {
       all_pixels(brightness, brightness, brightness);
     }
+
     time_now = millis();
     while (millis() < time_now + 500) {
       all_pixels(0, 0, 0);
@@ -705,12 +657,15 @@ void reaction_game() {
 
 
   //change mode
+
+  all_pixels(0, 0, 0);
+
   time_now = millis();
   while (millis() < time_now + 1000) {
-    all_pixels(brightness, brightness, brightness);
+
   }
 
-
+  all_pixels(0, 0, 0);
 
   random_time = random(3000, 10000);
 
@@ -725,7 +680,7 @@ void reaction_game() {
       p2s = millis();
       first = false;
     }
-    all_pixels(0, 0, brightness);
+    all_pixels( brightness, 0, 0);
     while (!detect_tap()) {
     }
     all_pixels(0, 0, 0);
@@ -738,10 +693,12 @@ void reaction_game() {
   time_now = millis();
   while (millis() < time_now + 500) {
     all_pixels(brightness, 0, brightness);
+
   }
   time_now = millis();
   while (millis() < time_now + 500) {
     all_pixels(0, 0, 0);
+
   }
 
   time_now = millis();
@@ -751,15 +708,18 @@ void reaction_game() {
   time_now = millis();
   while (millis() < time_now + 500) {
     all_pixels(0, 0, 0);
+
   }
 
   time_now = millis();
   while (millis() < time_now + 500) {
     all_pixels(brightness, 0, brightness);
+
   }
   time_now = millis();
   while (millis() < time_now + 500) {
     all_pixels(0, 0, 0);
+
   }
 
 
@@ -768,6 +728,7 @@ void reaction_game() {
     time_now = millis();
     while (millis() < time_now + 2000) {
       all_pixels(0, 0, brightness);
+
     }
   }
 
@@ -775,6 +736,7 @@ void reaction_game() {
     time_now = millis();
     while (millis() < time_now + 2000) {
       all_pixels(brightness, 0, 0);
+
     }
     all_pixels(0, 0, 0);
   }
@@ -784,46 +746,10 @@ void reaction_game() {
   first = true;
   second = true;
 
-}
-
-
-
-
-
-void check_tap() {
-  if ( imu.fifoAvailable() )
-  {
-    // DMP FIFO must be updated in order to update tap data
-    imu.dmpUpdateFifo();
-    // Check for new tap data by polling tapAvailable
-    if ( imu.tapAvailable() )
-    {
-      // If a new tap happened, get the direction and count
-      // by reading getTapDir and getTapCount
-      unsigned char tapDir = imu.getTapDir();
-      unsigned char tapCnt = imu.getTapCount();
-      switch (tapDir)
-      {
-        case TAP_X_UP:
-          Serial.print("Tap X+ ");
-          break;
-        case TAP_X_DOWN:
-          Serial.print("Tap X- ");
-          break;
-        case TAP_Y_UP:
-          Serial.print("Tap Y+ ");
-          break;
-        case TAP_Y_DOWN:
-          Serial.print("Tap Y- ");
-          break;
-        case TAP_Z_UP:
-          Serial.print("Tap Z+ ");
-          break;
-        case TAP_Z_DOWN:
-          Serial.print("Tap Z- ");
-          break;
-      }
-      Serial.println(tapCnt);
-    }
+  time_now = millis();
+  while (millis() < time_now + 5000) {
+    all_pixels(0, 0, 0);
   }
 }
+
+
