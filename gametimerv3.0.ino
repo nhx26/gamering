@@ -4,8 +4,6 @@
 #include <avr/power.h>
 #endif
 
-#define DELAYVAL 500
-
 #include "MPU9250.h"
 
 #include <MPU6050_tockn.h>
@@ -23,8 +21,6 @@ Adafruit_NeoPixel pixels(NUMPIXELS, PIN, NEO_GRB + NEO_KHZ800);
 MPU6050 mpu6050(Wire);
 
 MPU9250_DMP imu;
-
-int status;
 
 int mode = 0; // Game ring mode
 
@@ -437,7 +433,7 @@ void show_coin_score(int score_made) {
           level = 0;
           enemy = 50;
 
-          //      //blink
+          //blink
           unsigned long time_now = millis();
           while (millis() < time_now + 1000) {
             all_pixels(brightness, brightness, brightness);
@@ -450,6 +446,7 @@ void show_coin_score(int score_made) {
 
       }
     }
+    
     // For scores greater than 15
     score_made -= 15;
     for (int i = 0; i < 16; i++) {
