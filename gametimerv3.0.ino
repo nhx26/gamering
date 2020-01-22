@@ -1,11 +1,11 @@
 #include <Adafruit_NeoPixel.h>
 #ifdef __AVR__
-#include <avr/power.h> // Required for 16 MHz Adafruit Trinket
+#include <avr/power.h> 
 #endif
 
-#define PIN 5 // On Trinket or Gemma, suggest changing this to 1
+#define PIN 5 // WS2812 leds are connected to this pin 
 
-#define NUMPIXELS 16 // Popular NeoPixel ring size
+#define NUMPIXELS 16 // 16 leds are used on the game ring pcb
 
 Adafruit_NeoPixel pixels(NUMPIXELS, PIN, NEO_GRB + NEO_KHZ800);
 
@@ -182,14 +182,14 @@ void loop() {
   reaction_game();
 }
 
-
+//This function lights up a random pixel on the board within a given range
 int random_pixel(int min_, int max_) {
   int target = random(min_ , max_);
   pixels.setPixelColor(target, pixels.Color(brightness, 0, 0));
   pixels.show();
   return target;
 }
-
+//This function lights up all the pixels on the board to the given RGB values
 void all_pixels(int r, int g, int b) {
 
   for (int i = 0; i <= 15 ; i++) {
@@ -198,15 +198,16 @@ void all_pixels(int r, int g, int b) {
   pixels.show();
 }
 
+//Dice roll game mode
 void dice_roll() {
-
+  //detecting shake along both X and Y axes
   if ((abs(mpu6050.getAccX()) > 1) || abs(mpu6050.getAccY()) > 1) {
 
     for (int i = 0; i < rand; i++) {
       pixels.setPixelColor(i, pixels.Color(0, 0, 0));
     }
     pixels.show();
-    int rand = random(1, 12);
+    int rand = random(1, 12); 
 
 
     for (int i = 0; i < rand ; i += 2) {
@@ -234,6 +235,7 @@ void dice_roll() {
 
 }
 
+//Spinner game mode
 void spinner() {
 
   if ((abs(mpu6050.getAccX()) > 1) || abs(mpu6050.getAccY()) > 1) {
