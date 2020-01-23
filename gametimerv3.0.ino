@@ -47,7 +47,7 @@ boolean showscore = true;
 
 int timer = 0;
 
-int brightness = 30; // Brightness for all LEDs
+int brightness = 20; // Brightness for all LEDs
 
 int current_pos = 0;
 int prev_pos;
@@ -123,27 +123,33 @@ void loop() {
   //  Mode flipping indicator (blue)
   show_flip();
 
-  if (mode % 5 == 0) {
+  if (mode % 6 == 0) {
     catch_the_coin();
   }
 
-  if (mode % 5 == 1) {
+  if (mode % 6 == 1) {
     tap_game();
   }
 
-  if (mode % 5 == 2) {
+  if (mode % 6 == 2) {
     reaction_game();
   }
 
-  if (mode % 5 == 3) {
+  if (mode % 6 == 3) {
     dice_roll();
   }
 
-  if (mode % 5 == 4) {
+  if (mode % 6 == 4) {
     spinner();
   }
 
+  if (mode % 6 == 5) {
+    all_off();
+  }
+}
 
+void all_off() {
+  all_pixels(0, 0, 0);
 }
 
 // Function to show mode change
@@ -310,8 +316,8 @@ boolean detect_tap() {
 
 
 boolean detect_flip() {
-  
-if (mpu6050.getAccZ() < -1) {
+
+  if (mpu6050.getAccZ() < -1) {
     Serial.println("flip");
     return true;
   }
@@ -444,7 +450,7 @@ void show_coin_score(int score_made) {
 
       }
     }
-    
+
     // For scores greater than 15
     score_made -= 15;
     for (int i = 0; i < 16; i++) {
