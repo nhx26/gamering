@@ -5,8 +5,9 @@ NYUAD Design and Innovation 2020 Group 2
 
 ## Game Modes
 
-Spinner <br />
-Hourglass <br />
-Dice Roll <br />
 Catch the coin <br />
-Shaking game <br />
+Tap Delight <br />
+Reaction <br />
+Dice Roll <br />
+Spinner <br />
+Sleep Mode <br />
