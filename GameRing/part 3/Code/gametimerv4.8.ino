@@ -765,5 +765,3 @@ void reaction_game() {
     }
   }
 }
-
-
